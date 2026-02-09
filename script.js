@@ -1,128 +1,148 @@
 //HOME BANKING
 
-//BASE DE DATOS
-let datosUsuarios = [
-{
-    nombre: "Victoria",
-    email: "victoria@gmail.com",
-    contraseña: "1234",
-    saldo: 13000,
-    prestamo: true
-},
-{
-    nombre: "Rodrigo",
-    email: "rodrigo@gmail.com",
-    contraseña: "1234fe",
-    saldo: 200000,
-    prestamo: false
-},
-{
-    nombre: "Lucia",
-    email: "lucia@gmail.com",
-    contraseña: "lucia123",
-    saldo: 500,
-    prestamo: false
-}]
+// BASE DE DATOS
+const datosUsuarios = [
+    { nombre: "Victoria", email: "victoria@gmail.com", contraseña: "1234", saldo: 13000, prestamo: true },
+    { nombre: "Rodrigo", email: "rodrigo@gmail.com", contraseña: "1234fe", saldo: 200000, prestamo: false },
+    { nombre: "Lucia", email: "lucia@gmail.com", contraseña: "lucia123", saldo: 5000.49, prestamo: false },
+    { nombre: "Ricardo", email: "ricardo@gmail.com", contraseña: "ricardo1234", saldo: 300000, prestamo: true },
+    { nombre: "Camila", email: "camila@gmail.com", contraseña: "cami1234", saldo: 250000, prestamo: true }
+]
 
-//FUNCION BUSCAR USUARIO Y CONECTARSE
-function login(){
+let usuarioConectado = JSON.parse(localStorage.getItem("usuario")) || null
 
-    let intentos = 3
-    let usuarioConectado = null
+// VARIABLES DEL DOM 
+const loginSection = document.getElementById("login")
+const menuSection = document.getElementById("menu")
+const resultado = document.getElementById("resultado")
+const bienvenida = document.getElementById("bienvenida")
 
-    while(intentos > 0 && usuarioConectado === null){
-        const emailIngresado = prompt("Ingrese su email")
-        const contraseñaIngresada = prompt("Ingrese su contraseña")
-        for(i = 0; i < datosUsuarios.length; i++){
-            if(emailIngresado === datosUsuarios[i].email && contraseñaIngresada === datosUsuarios[i].contraseña){
-                alert(`Bienvenid@ ${datosUsuarios[i].nombre}`)
-                usuarioConectado = datosUsuarios[i]
-            break
-            }
-        }
-        if(usuarioConectado === null){
-            intentos--
-            alert(`Usuario o contreseña incorrecta. "Quedan ${intentos} intentos`)
-        }
-    } 
-    if(usuarioConectado !== null){
-        menuPrincipal(usuarioConectado)
-    } else{
-            alert("Cuenta bloqueada")
-    }
-
+//Funcion guardar cambios en locaStorage
+function actualizarStorage() {
+    localStorage.setItem("usuario", JSON.stringify(usuarioConectado))
+}
+// Muestra el menú y oculta el login cuando el usuario inicia sesión
+function iniciarSesion() {
+    loginSection.classList.add("hidden")
+    menuSection.classList.remove("hidden")
+    bienvenida.textContent = `Bienvenido ${usuarioConectado.nombre}`
+}
+//FUNCION VER SALDO DEL USUARIO
+function verSaldo() {
+    resultado.textContent = `Saldo disponible: $${usuarioConectado.saldo}`
 }
 
+//FUNCION TRANSFERIR DINERO
+function transferirDinero() {
+    const emailDestino = document.getElementById("emailDestino").value.trim()
+    const monto = Number(document.getElementById("montoTransferir").value)
 
-function menuPrincipal(usuario){
-
-    let salir = false
-    while(salir === false){
-        const opcion = prompt("MENU PRINCIPAL\n" + "1 - Ver saldo\n" + "2 - Transferir\n" + "3 - Simular prestamo\n" + "4 - Salir")
-
-        switch(opcion){
-            case "1":
-                verSaldo(usuario)
-                break
-            case "2":
-                transferir(usuario)
-                break
-            case "3":
-                simularPrestamo(usuario)
-                break
-            case "4":
-                salir = true
-                break
-            default:
-                alert("Opción incorrecta")
-        }
-    }
-}
-
-function verSaldo(usuario){
-    alert(`Tu saldo es: $${usuario.saldo}`)
-}
-
-function transferir(usuario){
-    const dineroTransferir = Number(prompt("Ingrese el monto a transferir"))
-    if(dineroTransferir > 0 && dineroTransferir < usuario.saldo){
-        usuario.saldo -= dineroTransferir
-        alert(`Transferencia realizada.\n Su saldo es: $${usuario.saldo}`)
-    } else{
-        alert("Saldo insuficiente")
-    }
-}
-
-
-function simularPrestamo(usuario) {
-    if (!usuario.prestamo) {
-        alert("Función no habilitada para su perfil")
+    if (!emailDestino) {
+        resultado.textContent = "Debés ingresar un email de destino"
         return
     }
-    const monto = Number(prompt("Ingrese el monto del préstamo"))
-    if (isNaN(monto) || monto < 0) {
-        alert("Monto inválido")
+    if (monto <= 0) {
+        resultado.textContent = "El monto ingresado no es válido. Ingresá un valor mayor a $0."
         return
     }
-    const opcion = prompt("Cuotas:\n" + "1 - 1 cuota sin interés\n" + "2 - 3 cuotas (15%)\n" + "3 - 6 cuotas (25%)\n" + "4 - Volver al menú")
-    let cuota
-    switch (opcion) {
-        case "1":
-            cuota = monto
-            break
-        case "2":
-            cuota = (monto * 1.15) / 3
-            break
-        case "3":
-            cuota = (monto * 1.25) / 6
-            break
-        case "4":
-            return
-        default:
-            alert("Opción inválida")
-            return
+    const usuarioDestino = datosUsuarios.find(
+        usuario => usuario.email === emailDestino
+    )
+    if (!usuarioDestino) {
+        resultado.textContent = "No existe ningún usuario registrado con ese email."
+        return
     }
-    alert(`Cuota mensual: $${cuota.toFixed(0)}`)
+    if (usuarioDestino.email === usuarioConectado.email) {
+        resultado.textContent = "No podés transferirte dinero a vos mismo"
+        return
+    }
+    if (monto > usuarioConectado.saldo) {
+        resultado.textContent = "No se pudo realizar la transferencia porque el saldo es insuficiente."
+        return
+    }
+
+    usuarioConectado.saldo -= monto
+    usuarioDestino.saldo += monto
+
+    // Guardar cambios
+    actualizarStorage()
+    localStorage.setItem("usuarios", JSON.stringify(datosUsuarios))
+
+    resultado.innerHTML = `
+        Transferencia exitosa <br>
+        Enviados: $${monto} <br>
+        Destinatario: ${usuarioDestino.nombre} <br>
+        Saldo actual: $${usuarioConectado.saldo}
+    `
 }
 
-login()
+//FUNCIONES CALCULAR CUOTAS DEL PRESTAMO Y SOLICITAR PRESTAMO
+function calcularCuota(monto, cuotas) {
+    let interes = 0
+    if (cuotas === 3) interes = 0.15
+    if (cuotas === 6) interes = 0.25
+    const total = monto * (1 + interes)
+    return total / cuotas
+}
+
+function solicitarPrestamo() {
+    if (!usuarioConectado.prestamo) {
+        resultado.textContent = "Tu perfil no tiene préstamos habilitados. Contactá con el banco para más información."
+        return
+    }
+
+    const monto = Number(document.getElementById("montoPrestamo").value)
+    const cuotas = Number(document.getElementById("cuotas").value)
+
+    if (monto <= 0 || !cuotas) {
+        resultado.textContent = "Ingresá un monto válido y seleccioná cuotas"
+        return
+    }
+
+    const cuotaMensual = calcularCuota(monto, cuotas)
+
+    usuarioConectado.saldo += monto
+    actualizarStorage()
+
+    resultado.innerHTML = `
+        Préstamo aprobado <br>
+        Monto acreditado: $${monto}<br>
+        Cuotas: ${cuotas}<br>
+        Valor de cada cuota: $${cuotaMensual.toFixed(2)}<br>
+        Nuevo saldo: $${usuarioConectado.saldo}
+    `
+}
+
+//Funcion cerrar sesion
+function cerrarSesion() {
+    localStorage.removeItem("usuario")
+    location.reload()
+}
+
+//Funcion buscar usuario y conectarse
+document.getElementById("btnLogin").addEventListener("click", () => {
+    const email = document.getElementById("email").value
+    const password = document.getElementById("password").value
+
+    const usuario = datosUsuarios.find(
+        u => u.email === email && u.contraseña === password
+    )
+
+    if (usuario) {
+        usuarioConectado = usuario
+        actualizarStorage()
+        iniciarSesion()
+    } else {
+        document.getElementById("loginMsg").textContent = "Email o contraseña incorrectos"
+    }
+})
+
+document.getElementById("btnSaldo").addEventListener("click", verSaldo)
+document.getElementById("btnTransferir").addEventListener("click", transferirDinero)
+document.getElementById("btnPrestamo").addEventListener("click", solicitarPrestamo)
+document.getElementById("btnSalir").addEventListener("click", cerrarSesion)
+
+//Si existe un usuario en localStorage, inicia sesión automáticamente
+if (usuarioConectado) {
+    iniciarSesion()
+}

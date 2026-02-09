@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador Bancario</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-container">
+
+    <h1>HOME BANKING</h1>
+
+    <section id="login">
+        <h2>¡Hola! Te damos la bienvenida</h2>
+        <p>Escribe tu email y contraseña para empezar a operar</p>
+
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button id="btnLogin">Ingresar</button>
+
+        <p id="loginMsg"></p>
+    </section>
+
+    <section id="menu" class="hidden">
+        <h2 id="bienvenida"></h2>
+
+        <button id="btnSaldo">Ver saldo</button>
+
+        <h3>Transferir dinero</h3>
+        <input type="email" id="emailDestino" placeholder="Email del destinatario">
+        <input type="number" id="montoTransferir" placeholder="Monto a transferir">
+        <button id="btnTransferir">Transferir</button>
+
+        <h3>Solicitar préstamo</h3>
+        <input type="number" id="montoPrestamo" placeholder="Monto del préstamo">
+
+        <select id="cuotas">
+            <option value="">Seleccionar cuotas</option>
+            <option value="1">1 cuota (sin interés)</option>
+            <option value="3">3 cuotas (15%)</option>
+            <option value="6">6 cuotas (25%)</option>
+        </select>
+
+        <button id="btnPrestamo">Solicitar préstamo</button>
+
+        <button id="btnSalir">Cerrar sesión</button>
+
+        <div id="resultado"></div>
+    </section>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
