@@ -23,6 +23,7 @@ const btnAbrirTransferencias = document.getElementById("btnMenuTransferir")
 const panelTransferencias = document.getElementById("contenedorTransferencia")
 const btnAbrirPrestamos = document.getElementById("btnMenuPrestamos")
 const panelPrestamos = document.getElementById("contenedorPrestamos")
+const eventoUsuarioInactivo = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"]
 
 //FUNCIÓN PARA GUARDAR MODIFICACIONES EN LA BASE DE DATOS CON LOCALSTORAGE
 function actualizarStorage() {
@@ -160,6 +161,33 @@ function cerrarSesion() {
     localStorage.removeItem("usuario")
     location.reload()
 }
+//CERRAR SESION CUANDO EL USUARIO NO INTERACTUA CON EL DOM POR SEGURIDAD
+let tiempoInactivo
+
+function reiniciarTiempo(){
+    if (usuarioConectado){
+        clearTimeout(tiempoInactivo)
+        tiempoInactivo = setTimeout(cerrarSesionInactivo, 60000)
+    }
+}
+function cerrarSesionInactivo(){
+    localStorage.removeItem("usuario")
+    Swal.fire({
+        icon: "warning",
+        title: "Sesión expirada",
+        text: "Por tu seguridad, cerramos tu sesión.",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Volver a ingresar",
+        allowOutsideClick: false 
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.reload();
+        }
+    });
+}
+eventoUsuarioInactivo.forEach(evento => {
+    document.addEventListener(evento, reiniciarTiempo, true);
+});
 
 //FUNCIÓN BUSCAR USUARIO Y CONECTARSE
 document.getElementById("btnLogin").addEventListener("click", () => {
@@ -183,4 +211,6 @@ document.getElementById("btnSalir").addEventListener("click", cerrarSesion)
 //SI EXISTE UN USUARIO EN LOCALSTORAGE, INICIA SESION AUTOMÁTICAMENTE
 if (usuarioConectado) {
     iniciarSesion()
+    reiniciarTiempo()
 }
+
