@@ -19,6 +19,10 @@ const loginSection = document.getElementById("login")
 const menuSection = document.getElementById("menu")
 const resultado = document.getElementById("resultado")
 const bienvenida = document.getElementById("bienvenida")
+const btnAbrirTransferencias = document.getElementById("btnMenuTransferir")
+const panelTransferencias = document.getElementById("contenedorTransferencia")
+const btnAbrirPrestamos = document.getElementById("btnMenuPrestamos")
+const panelPrestamos = document.getElementById("contenedorPrestamos")
 
 //FUNCIÓN PARA GUARDAR MODIFICACIONES EN LA BASE DE DATOS CON LOCALSTORAGE
 function actualizarStorage() {
@@ -40,50 +44,64 @@ function verSaldo() {
     resultado.textContent = `Saldo disponible: $${usuarioConectado.saldo}`
 }
 
+//ABRIR CONTENEDOR DE TRANSFERENCIAS
+btnAbrirTransferencias.addEventListener("click", () => {panelTransferencias.classList.toggle("hidden")})
 //FUNCIÓN TRANSFERIR DINERO 
 function transferirDinero() {
     const emailDestino = document.getElementById("emailDestino").value.trim()
     const monto = Number(document.getElementById("montoTransferir").value)
 
+    const usuarioDestino = usuariosGuardados.find(usuario => usuario.email === emailDestino)
+    //swal.fire --> libreria sweetAlert
     if (!emailDestino) {
-        resultado.textContent = "Debés ingresar un email de destino"
+        swal.fire("Opps", "Debés ingresar un email de destino", "warning")
         return
     }
     if (monto <= 0) {
-        resultado.textContent = "El monto ingresado no es válido. Ingresá un valor mayor a $0."
+        swal.fire("Opps", "El monto ingresado no es válido. Ingresá un valor mayor a $0.", "warning")
         return
     }
-    const usuarioDestino = usuariosGuardados.find(
-        usuario => usuario.email === emailDestino
-    )
     if (!usuarioDestino) {
-        resultado.textContent = "No existe ningún usuario registrado con ese email."
+        swal.fire("Opps", "No existe ningún usuario registrado con ese email.", "warning")
         return
     }
     if (usuarioDestino.email === usuarioConectado.email) {
-        resultado.textContent = "No podés transferirte dinero a vos mismo"
+        swal.fire("Opps", "No podés transferirte dinero a vos mismo", "warning")
         return
     }
     if (monto > usuarioConectado.saldo) {
-        resultado.textContent = "No se pudo realizar la transferencia porque el saldo es insuficiente."
+        swal.fire("Opps", "No se pudo realizar la transferencia porque el saldo es insuficiente.", "warning")
         return
     }
-
-    usuarioConectado.saldo -= monto
-    usuarioDestino.saldo += monto
-
-    // GUARDAR CAMBIOS
-    actualizarStorage()
-
-
-
-    resultado.innerHTML = `
-        Transferencia exitosa <br>
-        Enviados: $${monto} <br>
+    //USO DE LIBRERIA "SWEETALERT" PARA CONFIRMAR LOS DATOS DE LA TRANSFERENCIA
+    Swal.fire({
+        title: "¿DESEA CONFIRMAR TRANSFERENCIA?",
+        html:`
+        Monto: $${monto}<br>
         Destinatario: ${usuarioDestino.nombre} <br>
-        Saldo actual: $${usuarioConectado.saldo}
-    `
+        Email: ${usuarioDestino.email}`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "TRANFERIR",
+        cancelButtonText: "CANCELAR"
+}).then((result) => {
+    if (result.isConfirmed) {
+        usuarioConectado.saldo -= monto
+        usuarioDestino.saldo += monto
+        // GUARDAR CAMBIOS
+        actualizarStorage()
+        Swal.fire({
+            title: "TRANSFERENCIA EXITOSA",
+            html:`saldo actual: ${usuarioConectado.saldo}`,
+            icon: "success"
+    });
 }
+})
+}
+// ABRIR CONTENEDOR DE PRESTAMOS
+btnAbrirPrestamos.addEventListener("click", () => {panelPrestamos.classList.toggle("hidden")})
 
 //FUNCIONES CALCULAR CUOTAS DEL PRÉSTAMO Y SOLICITARLO
 function calcularCuota(monto, cuotas) {
@@ -96,7 +114,7 @@ function calcularCuota(monto, cuotas) {
 
 function solicitarPrestamo() {
     if (!usuarioConectado.prestamo) {
-        resultado.textContent = "Tu perfil no tiene préstamos habilitados. Contactá con el banco para más información."
+        swal.fire("Opps", "Tu perfil no tiene préstamos habilitados. <br> Contactá con el banco para más información.", "warning")
         return
     }
 
@@ -104,22 +122,37 @@ function solicitarPrestamo() {
     const cuotas = Number(document.getElementById("cuotas").value)
 
     if (monto <= 0 || !cuotas) {
-        resultado.textContent = "Ingresá un monto válido y seleccioná cuotas"
+        swal.fire("Opps", "Ingresá un monto válido y seleccioná cuotas", "warning")
         return
     }
 
     const cuotaMensual = calcularCuota(monto, cuotas)
-
-    usuarioConectado.saldo += monto
-    actualizarStorage()
-
-    resultado.innerHTML = `
-        Préstamo aprobado <br>
-        Monto acreditado: $${monto}<br>
-        Cuotas: ${cuotas}<br>
-        Valor de cada cuota: $${cuotaMensual.toFixed(2)}<br>
-        Nuevo saldo: $${usuarioConectado.saldo}
-    `
+    //USO DE LIBRERIA "SWEETALERT" PARA CONFIRMAR PRESTAMOS
+    Swal.fire({
+        title: "CONFIRMAR PRESTAMO",
+        html:`
+        Monto solicitado: $${monto}<br>
+        Cantidad de cuotas: ${cuotas}<br>
+        Valor de cada cuota: $${cuotaMensual.toFixed(2)}<br>`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "CONFIRMAR",
+        cancelButtonText: "CANCELAR"
+}).then((result) => {
+    if (result.isConfirmed) {
+        usuarioConectado.saldo += monto
+        //GUARDAR CAMBIOS
+        actualizarStorage()
+        Swal.fire({
+            title: "PRESTAMO CONFIRMADO",
+            html:` Ya se encuentra disponible tu prestamo <br>
+            Tu saldo saldo: $${usuarioConectado.saldo}`,
+            icon: "success"
+    });
+}
+})
 }
 
 //FUNCIÓN CERRAR SESIÓN
@@ -132,11 +165,7 @@ function cerrarSesion() {
 document.getElementById("btnLogin").addEventListener("click", () => {
     const email = document.getElementById("email").value
     const password = document.getElementById("password").value
-
-    const usuario = usuariosGuardados.find(
-        u => u.email === email && u.contraseña === password
-    )
-
+    const usuario = usuariosGuardados.find(u => u.email === email && u.contraseña === password)
     if (usuario) {
         usuarioConectado = usuario
         actualizarStorage()

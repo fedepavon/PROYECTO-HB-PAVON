@@ -24,33 +24,36 @@
 
     <section id="menu" class="hidden">
         <h2 id="bienvenida"></h2>
-
+        <div id="resultado"></div>
         <button id="btnSaldo">Ver saldo</button>
 
-        <h3>Transferir dinero</h3>
-        <input type="email" id="emailDestino" placeholder="Email del destinatario">
-        <input type="number" id="montoTransferir" placeholder="Monto a transferir">
-        <button id="btnTransferir">Transferir</button>
-
-        <h3>Solicitar préstamo</h3>
-        <input type="number" id="montoPrestamo" placeholder="Monto del préstamo">
-
-        <select id="cuotas">
-            <option value="">Seleccionar cuotas</option>
-            <option value="1">1 cuota (sin interés)</option>
-            <option value="3">3 cuotas (15%)</option>
-            <option value="6">6 cuotas (25%)</option>
-        </select>
-
-        <button id="btnPrestamo">Solicitar préstamo</button>
-
+        <button id="btnMenuTransferir">Transferencias</button>
+        <div id="contenedorTransferencia" class="hidden">
+            <h3>Transferir dinero</h3>
+            <input type="email" id="emailDestino" placeholder="Email del destinatario">
+            <input type="number" id="montoTransferir" placeholder="Monto a transferir">
+            <button id="btnTransferir">Transferir</button>
+        </div>
+        
+        <button id="btnMenuPrestamos">Préstamos</button>
+        <div id="contenedorPrestamos" class="hidden">
+            <h3>Solicitar préstamo</h3>
+            <input type="number" id="montoPrestamo" placeholder="Monto del préstamo">
+            <select id="cuotas">
+                <option value="">Seleccionar cuotas</option>
+                <option value="1">1 cuota (sin interés)</option>
+                <option value="3">3 cuotas (15%)</option>
+                <option value="6">6 cuotas (25%)</option>
+            </select>
+            <button id="btnPrestamo">Solicitar préstamo</button>
+        </div>
+        
         <button id="btnSalir">Cerrar sesión</button>
-
-        <div id="resultado"></div>
     </section>
 
-</div>
 
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="script.js"></script>
 </body>
 </html>
