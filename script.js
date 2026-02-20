@@ -1,7 +1,7 @@
 //HOME BANKING
 
 // BASE DE DATOS
-const datosUsuarios = [
+const datosUsuarios =[
     { nombre: "Victoria", email: "victoria@gmail.com", contraseña: "1234", saldo: 13000, prestamo: true },
     { nombre: "Rodrigo", email: "rodrigo@gmail.com", contraseña: "1234fe", saldo: 200000, prestamo: false },
     { nombre: "Lucia", email: "lucia@gmail.com", contraseña: "lucia123", saldo: 5000.49, prestamo: false },
@@ -9,6 +9,9 @@ const datosUsuarios = [
     { nombre: "Camila", email: "camila@gmail.com", contraseña: "cami1234", saldo: 250000, prestamo: true }
 ]
 
+ //RECUPERAR LA LISTA DE USUARIOS DESDE EL LOCALSTORAGE. SI ES EL PRIMER INGRESO USA LA BASE DE DATO ORIGINAL
+const usuariosGuardados = JSON.parse(localStorage.getItem("usuarios")) || datosUsuarios
+//VERIFICA SI NO HAY GUARDADA UNA SESIÓN
 let usuarioConectado = JSON.parse(localStorage.getItem("usuario")) || null
 
 // VARIABLES DEL DOM 
@@ -17,22 +20,27 @@ const menuSection = document.getElementById("menu")
 const resultado = document.getElementById("resultado")
 const bienvenida = document.getElementById("bienvenida")
 
-//Funcion guardar cambios en locaStorage
+//FUNCIÓN PARA GUARDAR MODIFICACIONES EN LA BASE DE DATOS CON LOCALSTORAGE
 function actualizarStorage() {
+    const buscarUsuario = usuariosGuardados.findIndex(u => u.email === usuarioConectado.email)
+    if(buscarUsuario !== -1){
+        usuariosGuardados[buscarUsuario] = usuarioConectado
+    }
     localStorage.setItem("usuario", JSON.stringify(usuarioConectado))
+    localStorage.setItem("usuarios",JSON.stringify(usuariosGuardados))
 }
-// Muestra el menú y oculta el login cuando el usuario inicia sesión
+//MUESTRA EL MENÚ Y OCULTA EL LOGIN CUANDO EL USUARIO INICIA SESIÓN
 function iniciarSesion() {
     loginSection.classList.add("hidden")
     menuSection.classList.remove("hidden")
     bienvenida.textContent = `Bienvenido ${usuarioConectado.nombre}`
 }
-//FUNCION VER SALDO DEL USUARIO
+//FUNCIÓN VER SALDO DEL USUARIO CONECTADO
 function verSaldo() {
     resultado.textContent = `Saldo disponible: $${usuarioConectado.saldo}`
 }
 
-//FUNCION TRANSFERIR DINERO
+//FUNCIÓN TRANSFERIR DINERO 
 function transferirDinero() {
     const emailDestino = document.getElementById("emailDestino").value.trim()
     const monto = Number(document.getElementById("montoTransferir").value)
@@ -45,7 +53,7 @@ function transferirDinero() {
         resultado.textContent = "El monto ingresado no es válido. Ingresá un valor mayor a $0."
         return
     }
-    const usuarioDestino = datosUsuarios.find(
+    const usuarioDestino = usuariosGuardados.find(
         usuario => usuario.email === emailDestino
     )
     if (!usuarioDestino) {
@@ -64,9 +72,10 @@ function transferirDinero() {
     usuarioConectado.saldo -= monto
     usuarioDestino.saldo += monto
 
-    // Guardar cambios
+    // GUARDAR CAMBIOS
     actualizarStorage()
-    localStorage.setItem("usuarios", JSON.stringify(datosUsuarios))
+
+
 
     resultado.innerHTML = `
         Transferencia exitosa <br>
@@ -76,7 +85,7 @@ function transferirDinero() {
     `
 }
 
-//FUNCIONES CALCULAR CUOTAS DEL PRESTAMO Y SOLICITAR PRESTAMO
+//FUNCIONES CALCULAR CUOTAS DEL PRÉSTAMO Y SOLICITARLO
 function calcularCuota(monto, cuotas) {
     let interes = 0
     if (cuotas === 3) interes = 0.15
@@ -113,18 +122,18 @@ function solicitarPrestamo() {
     `
 }
 
-//Funcion cerrar sesion
+//FUNCIÓN CERRAR SESIÓN
 function cerrarSesion() {
     localStorage.removeItem("usuario")
     location.reload()
 }
 
-//Funcion buscar usuario y conectarse
+//FUNCIÓN BUSCAR USUARIO Y CONECTARSE
 document.getElementById("btnLogin").addEventListener("click", () => {
     const email = document.getElementById("email").value
     const password = document.getElementById("password").value
 
-    const usuario = datosUsuarios.find(
+    const usuario = usuariosGuardados.find(
         u => u.email === email && u.contraseña === password
     )
 
@@ -142,7 +151,7 @@ document.getElementById("btnTransferir").addEventListener("click", transferirDin
 document.getElementById("btnPrestamo").addEventListener("click", solicitarPrestamo)
 document.getElementById("btnSalir").addEventListener("click", cerrarSesion)
 
-//Si existe un usuario en localStorage, inicia sesión automáticamente
+//SI EXISTE UN USUARIO EN LOCALSTORAGE, INICIA SESION AUTOMÁTICAMENTE
 if (usuarioConectado) {
     iniciarSesion()
 }
