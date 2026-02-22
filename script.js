@@ -34,7 +34,6 @@ const bienvenida = document.getElementById("bienvenida")
 const btnabrirSaldo = document.getElementById("btnSaldo")
 const btnAbrirPerfil = document.getElementById("btnPerfil")
 const panelPerfil = document.getElementById("contenedorPerfil")
-const btnCerrarPerfil = document.getElementById("btnCerrarPerfil")
 const btnAbrirTransferencias = document.getElementById("btnMenuTransferir")
 const panelTransferencias = document.getElementById("contenedorTransferencia")
 const btnAbrirPrestamos = document.getElementById("btnMenuPrestamos")
@@ -43,11 +42,12 @@ const eventoUsuarioInactivo = ["mousedown", "mousemove", "keypress", "scroll", "
 
 //FUNCIÓN PARA GUARDAR MODIFICACIONES EN LA BASE DE DATOS CON LOCALSTORAGE
 function actualizarStorage() {
-    const buscarUsuario = usuariosGuardados.findIndex(u => u.usuario === usuarioConectado.email)
+    const buscarUsuario = usuariosGuardados.findIndex(u => u.usuario === usuarioConectado.usuario)
     if(buscarUsuario !== -1){
         usuariosGuardados[buscarUsuario] = usuarioConectado
     }
     localStorage.setItem("usuario", JSON.stringify(usuarioConectado))
+    localStorage.setItem("usuarios", JSON.stringify(usuariosGuardados));
 }
 //MUESTRA EL MENÚ Y OCULTA EL LOGIN CUANDO EL USUARIO INICIA SESIÓN
 function iniciarSesion() {
@@ -58,6 +58,21 @@ function iniciarSesion() {
 //FUNCIÓN VER SALDO DEL USUARIO CONECTADO
 function verSaldo() {
     resultado.textContent = `Saldo disponible: $${usuarioConectado.saldo}`
+}
+
+//FUNCIÓN ABRIR PERFIL Y MOSTRAR DATOS DEL USUARIO CONECTADO
+btnAbrirPerfil.addEventListener("click", abrirPerfil)
+function abrirPerfil() {
+    if (usuarioConectado) {
+        document.getElementById("perfilNombre").textContent = usuarioConectado.nombre
+        document.getElementById("perfilUsuario").textContent = usuarioConectado.usuario
+        document.getElementById("perfilEmail").textContent = usuarioConectado.email
+        document.getElementById("perfilContraseña").textContent = usuarioConectado.contraseña
+
+        panelPerfil.classList.toggle("hidden")
+        panelTransferencias.classList.add("hidden")
+        panelPrestamos.classList.add("hidden")
+    }
 }
 
 //ABRIR CONTENEDOR DE TRANSFERENCIAS
@@ -206,9 +221,9 @@ eventoUsuarioInactivo.forEach(evento => {
 
 //FUNCIÓN BUSCAR USUARIO Y CONECTARSE
 document.getElementById("btnLogin").addEventListener("click", () => {
-    const usuario = document.getElementById("usuario").value
-    const password = document.getElementById("password").value
-    const UsuarioEncontrado = usuariosGuardados.find(u => u.usuario === usuario && u.contraseña === password)
+    const usuarioImput = document.getElementById("usuario").value
+    const contraseñaImput = document.getElementById("password").value
+    const UsuarioEncontrado = usuariosGuardados.find(u => u.usuario === usuarioImput && u.contraseña === contraseñaImput)
     if (UsuarioEncontrado) {
         usuarioConectado = UsuarioEncontrado
         actualizarStorage()
@@ -223,10 +238,10 @@ document.getElementById("btnTransferir").addEventListener("click", transferirDin
 document.getElementById("btnPrestamo").addEventListener("click", solicitarPrestamo)
 document.getElementById("btnSalir").addEventListener("click", cerrarSesion)
 
-//SI EXISTE UN USUARIO EN LOCALSTORAGE, INICIA SESION AUTOMÁTICAMENTE
-if (usuarioConectado) {
-    iniciarSesion()
-    reiniciarTiempo()
-}
 
-iniciarBaseDeDatos()
+iniciarBaseDeDatos().then(() => {
+    if (usuarioConectado) {
+        iniciarSesion()
+        reiniciarTiempo()
+    }
+})
