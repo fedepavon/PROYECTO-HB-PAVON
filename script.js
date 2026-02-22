@@ -1,24 +1,40 @@
 //HOME BANKING
 
-// BASE DE DATOS
-const datosUsuarios =[
-    { nombre: "Victoria", email: "victoria@gmail.com", contraseña: "1234", saldo: 13000, prestamo: true },
-    { nombre: "Rodrigo", email: "rodrigo@gmail.com", contraseña: "1234fe", saldo: 200000, prestamo: false },
-    { nombre: "Lucia", email: "lucia@gmail.com", contraseña: "lucia123", saldo: 5000.49, prestamo: false },
-    { nombre: "Ricardo", email: "ricardo@gmail.com", contraseña: "ricardo1234", saldo: 300000, prestamo: true },
-    { nombre: "Camila", email: "camila@gmail.com", contraseña: "cami1234", saldo: 250000, prestamo: true }
-]
-
- //RECUPERAR LA LISTA DE USUARIOS DESDE EL LOCALSTORAGE. SI ES EL PRIMER INGRESO USA LA BASE DE DATO ORIGINAL
-const usuariosGuardados = JSON.parse(localStorage.getItem("usuarios")) || datosUsuarios
+//Conectarse con la base de datos local
+let usuariosGuardados = []
 //VERIFICA SI NO HAY GUARDADA UNA SESIÓN
 let usuarioConectado = JSON.parse(localStorage.getItem("usuario")) || null
+
+async function iniciarBaseDeDatos() {
+    const data = localStorage.getItem("usuarios")
+
+    if(data){
+        usuariosGuardados = JSON.parse(data)
+    }
+    else{
+        try{
+            const res = await fetch("./datosUsuarios.json")
+            const datosOriginales = await res.json()
+            usuariosGuardados = datosOriginales
+            localStorage.setItem("usuarios",JSON.stringify(usuariosGuardados))
+            console.log(usuariosGuardados)
+        }
+        catch (error){
+            console.error("Error al conectarse a la base de datos", error)
+        }
+    }
+}
+
 
 // VARIABLES DEL DOM 
 const loginSection = document.getElementById("login")
 const menuSection = document.getElementById("menu")
 const resultado = document.getElementById("resultado")
 const bienvenida = document.getElementById("bienvenida")
+const btnabrirSaldo = document.getElementById("btnSaldo")
+const btnAbrirPerfil = document.getElementById("btnPerfil")
+const panelPerfil = document.getElementById("contenedorPerfil")
+const btnCerrarPerfil = document.getElementById("btnCerrarPerfil")
 const btnAbrirTransferencias = document.getElementById("btnMenuTransferir")
 const panelTransferencias = document.getElementById("contenedorTransferencia")
 const btnAbrirPrestamos = document.getElementById("btnMenuPrestamos")
@@ -27,12 +43,11 @@ const eventoUsuarioInactivo = ["mousedown", "mousemove", "keypress", "scroll", "
 
 //FUNCIÓN PARA GUARDAR MODIFICACIONES EN LA BASE DE DATOS CON LOCALSTORAGE
 function actualizarStorage() {
-    const buscarUsuario = usuariosGuardados.findIndex(u => u.email === usuarioConectado.email)
+    const buscarUsuario = usuariosGuardados.findIndex(u => u.usuario === usuarioConectado.email)
     if(buscarUsuario !== -1){
         usuariosGuardados[buscarUsuario] = usuarioConectado
     }
     localStorage.setItem("usuario", JSON.stringify(usuarioConectado))
-    localStorage.setItem("usuarios",JSON.stringify(usuariosGuardados))
 }
 //MUESTRA EL MENÚ Y OCULTA EL LOGIN CUANDO EL USUARIO INICIA SESIÓN
 function iniciarSesion() {
@@ -149,7 +164,7 @@ function solicitarPrestamo() {
         Swal.fire({
             title: "PRESTAMO CONFIRMADO",
             html:` Ya se encuentra disponible tu prestamo <br>
-            Tu saldo saldo: $${usuarioConectado.saldo}`,
+            Tu saldo actual: $${usuarioConectado.saldo}`,
             icon: "success"
     });
 }
@@ -191,15 +206,15 @@ eventoUsuarioInactivo.forEach(evento => {
 
 //FUNCIÓN BUSCAR USUARIO Y CONECTARSE
 document.getElementById("btnLogin").addEventListener("click", () => {
-    const email = document.getElementById("email").value
+    const usuario = document.getElementById("usuario").value
     const password = document.getElementById("password").value
-    const usuario = usuariosGuardados.find(u => u.email === email && u.contraseña === password)
-    if (usuario) {
-        usuarioConectado = usuario
+    const UsuarioEncontrado = usuariosGuardados.find(u => u.usuario === usuario && u.contraseña === password)
+    if (UsuarioEncontrado) {
+        usuarioConectado = UsuarioEncontrado
         actualizarStorage()
         iniciarSesion()
     } else {
-        document.getElementById("loginMsg").textContent = "Email o contraseña incorrectos"
+        document.getElementById("loginMsg").textContent = "Usuario o contraseña incorrectos"
     }
 })
 
@@ -214,3 +229,4 @@ if (usuarioConectado) {
     reiniciarTiempo()
 }
 
+iniciarBaseDeDatos()
