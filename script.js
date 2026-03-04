@@ -25,13 +25,11 @@ async function iniciarBaseDeDatos() {
     }
 }
 
-
 // VARIABLES DEL DOM 
 const loginSection = document.getElementById("login")
 const menuSection = document.getElementById("menu")
 const resultado = document.getElementById("resultado")
 const bienvenida = document.getElementById("bienvenida")
-const btnabrirSaldo = document.getElementById("btnSaldo")
 const btnAbrirPerfil = document.getElementById("btnPerfil")
 const panelPerfil = document.getElementById("contenedorPerfil")
 const btnAbrirTransferencias = document.getElementById("btnMenuTransferir")
@@ -52,6 +50,7 @@ function actualizarStorage() {
 //MUESTRA EL MENÚ Y OCULTA EL LOGIN CUANDO EL USUARIO INICIA SESIÓN
 function iniciarSesion() {
     loginSection.classList.add("hidden")
+    document.getElementById("registro").classList.add("hidden")
     menuSection.classList.remove("hidden")
     bienvenida.textContent = `Bienvenido ${usuarioConectado.nombre}`
 }
@@ -73,6 +72,39 @@ function abrirPerfil() {
         panelTransferencias.classList.add("hidden")
         panelPrestamos.classList.add("hidden")
     }
+}
+
+//FUNCIÓN PARA CREAR NUEVO USUARIO Y GUARDARLO EN LA BASE DE DATO LOCAL
+document.getElementById("btnRegistrar").addEventListener("click", crearNuevoUsuario)
+function crearNuevoUsuario(){
+    const nombre = document.getElementById("registroNombre").value.trim()
+    const usuario = document.getElementById("registroUsuario").value.trim()
+    const email = document.getElementById("registroEmail").value.trim()
+    const contraseña = document.getElementById("registroContraseña").value.trim()
+
+    if(!nombre || !usuario || !email || !contraseña){
+        Swal.fire("Error", "Todos los campos son obligatorios", "warning")
+        return
+    }
+
+    const nuevoUsuario = {
+        id: Date.now(),
+        nombre: nombre,
+        usuario: usuario,
+        email: email,
+        contraseña: contraseña,
+        saldo: 0,
+        prestamo: false
+    }
+
+    usuariosGuardados.push(nuevoUsuario)
+    localStorage.setItem("usuarios", JSON.stringify(usuariosGuardados))
+    Swal.fire("¡Bienvenido!", "Usuario registrado con éxito", "success")
+
+    document.getElementById("registroNombre").value = ""
+    document.getElementById("registroUsuario").value = ""
+    document.getElementById("registroEmail").value = ""
+    document.getElementById("registroContraseña").value = ""
 }
 
 //ABRIR CONTENEDOR DE TRANSFERENCIAS
@@ -220,7 +252,8 @@ eventoUsuarioInactivo.forEach(evento => {
 });
 
 //FUNCIÓN BUSCAR USUARIO Y CONECTARSE
-document.getElementById("btnLogin").addEventListener("click", () => {
+
+document.getElementById("btnIngresar").addEventListener("click", () => {
     const usuarioImput = document.getElementById("usuario").value
     const contraseñaImput = document.getElementById("password").value
     const UsuarioEncontrado = usuariosGuardados.find(u => u.usuario === usuarioImput && u.contraseña === contraseñaImput)

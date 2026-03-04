@@ -42,5 +42,6 @@
     "email": "camila@gmail.com", 
     "contraseña": "cami1234", 
     "saldo": 250000, 
-    "prestamo": true }
+    "prestamo": true 
+}
 ]
