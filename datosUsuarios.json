@@ -6,6 +6,7 @@
     "email": "victoria@gmail.com",
     "contraseña": "1234",
     "saldo": 13000,
+    "alias": "vickyp",
     "prestamo": true 
 },
 {
@@ -15,6 +16,7 @@
     "email": "rodrigo@gmail.com",
     "contraseña": "1234fe",
     "saldo": 200000,
+    "alias": "rodri.mp",
     "prestamo": false
 },
 {
@@ -24,6 +26,7 @@
     "email": "lucia@gmail.com", 
     "contraseña": "lucia123", 
     "saldo": 5000.49, 
+    "alias": "lucia",
     "prestamo": false 
 },
 {
@@ -32,7 +35,8 @@
     "usuario": "ricardo",
     "email": "ricardo@gmail.com", 
     "contraseña": "ricardo1234", 
-    "saldo": 300000, 
+    "saldo": 300000,
+    "alias": "ricardo.gon",
     "prestamo": true 
 },
 {
@@ -41,7 +45,8 @@
     "usuario": "cami", 
     "email": "camila@gmail.com", 
     "contraseña": "cami1234", 
-    "saldo": 250000, 
+    "saldo": 250000,
+    "alias": "camila",
     "prestamo": true 
 }
 ]

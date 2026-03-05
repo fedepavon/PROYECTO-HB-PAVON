@@ -79,6 +79,7 @@ function mostrarDatosPerfil() {
     document.getElementById("perfilEmail").textContent = usuarioConectado.email
     document.getElementById("perfilUsuario").textContent = usuarioConectado.usuario
     document.getElementById("perfilContraseña").textContent = usuarioConectado.contraseña
+    document.getElementById("perfilAlias").textContent = usuarioConectado.alias
 }
 
 //EDITAR PERFIL
@@ -86,6 +87,7 @@ document.getElementById("btnEditarPerfil").addEventListener("click", abrirEdicio
 function abrirEdicionPerfil() {
     document.getElementById("perfilNombreInput").value = usuarioConectado.nombre
     document.getElementById("perfilPasswordInput").value = ""
+    document.getElementById("perfilAliasInput").value = usuarioConectado.alias
     perfilVista.classList.add("hidden")
     perfilEdicion.classList.remove("hidden")
 }
@@ -95,13 +97,19 @@ document.getElementById("btnGuardarPerfil").addEventListener("click", guardarPer
 function guardarPerfil() {
     const nuevoNombre = document.getElementById("perfilNombreInput").value.trim()
     const nuevaContraseña = document.getElementById("perfilPasswordInput").value
+    const nuevoAlias = document.getElementById("perfilAliasInput").value.trim()
 
     if (!nuevoNombre) {
         Swal.fire("Error", "El nombre no puede estar vacío", "warning")
         return
     }
+    if (!nuevoAlias) {
+        Swal.fire("Error", "Debes tener un alias para continuar", "warning")
+        return
+    }
 
     usuarioConectado.nombre = nuevoNombre
+    usuarioConectado.alias = nuevoAlias
     if (nuevaContraseña) {
         usuarioConectado.contraseña = nuevaContraseña
     }
@@ -129,8 +137,9 @@ function crearNuevoUsuario(){
     const usuario = document.getElementById("registroUsuario").value.trim()
     const email = document.getElementById("registroEmail").value.trim()
     const contraseña = document.getElementById("registroContraseña").value.trim()
+    const alias = document.getElementById("registroAlias").value.trim()
 
-    if(!nombre || !usuario || !email || !contraseña){
+    if(!nombre || !usuario || !email || !contraseña || !alias){
         Swal.fire("Error", "Todos los campos son obligatorios", "warning")
         return
     }
@@ -142,6 +151,7 @@ function crearNuevoUsuario(){
         email: email,
         contraseña: contraseña,
         saldo: 0,
+        alias: alias,
         prestamo: false
     }
 
@@ -153,6 +163,7 @@ function crearNuevoUsuario(){
     document.getElementById("registroUsuario").value = ""
     document.getElementById("registroEmail").value = ""
     document.getElementById("registroContraseña").value = ""
+    document.getElementById("registroAlias").value = ""
 }
 
 //ABRIR CONTENEDOR DE TRANSFERENCIAS
