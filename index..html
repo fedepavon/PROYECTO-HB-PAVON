@@ -37,10 +37,23 @@
         <button id="btnPerfil">Perfil</button>
         <div id="contenedorPerfil" class="hidden"> 
             <h3>Mi perfil</h3>
-            <p>Nombre: <span id="perfilNombre"></span></p>
-            <p>Email: <span id="perfilEmail"></span></p>
-            <p>Usuario: <span id="perfilUsuario"></span></p>
-            <p>Contraseña: <span id="perfilContraseña"></span></p>
+            
+            <div id="perfilVista">
+                <p>Nombre: <span id="perfilNombre"></span></p>
+                <p>Email: <span id="perfilEmail"></span></p>
+                <p>Usuario: <span id="perfilUsuario"></span></p>
+                <p>Contraseña: <span id="perfilContraseña"></span></p>
+                <button id="btnEditarPerfil">Editar perfil</button>
+            </div>
+            
+            <div id="perfilEdicion" class="hidden">
+                <label for="perfilNombreInput">Nombre</label>
+                <input type="text" id="perfilNombreInput" placeholder="Tu nombre">
+                <label for="perfilPasswordInput">Nueva contraseña</label>
+                <input type="password" id="perfilPasswordInput" placeholder="Dejar en blanco para no cambiar">
+                <button id="btnGuardarPerfil">Guardar cambios</button>
+                <button id="btnCancelarPerfil">Cancelar</button>
+            </div>
         </div>
             
         <button id="btnMenuTransferir">Transferencias</button>

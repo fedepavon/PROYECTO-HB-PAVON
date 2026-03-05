@@ -54,6 +54,16 @@ p {
     margin-bottom: 15px;
 }
 
+/* LABELS */
+label {
+    display: block;
+    text-align: left;
+    font-size: 14px;
+    color: #555;
+    margin-top: 12px;
+    margin-bottom: 4px;
+}
+
 /* INPUTS Y SELECT */
 input, select {
     width: 100%;

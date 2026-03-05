@@ -32,6 +32,8 @@ const resultado = document.getElementById("resultado")
 const bienvenida = document.getElementById("bienvenida")
 const btnAbrirPerfil = document.getElementById("btnPerfil")
 const panelPerfil = document.getElementById("contenedorPerfil")
+const perfilVista = document.getElementById("perfilVista")
+const perfilEdicion = document.getElementById("perfilEdicion")
 const btnAbrirTransferencias = document.getElementById("btnMenuTransferir")
 const panelTransferencias = document.getElementById("contenedorTransferencia")
 const btnAbrirPrestamos = document.getElementById("btnMenuPrestamos")
@@ -63,15 +65,61 @@ function verSaldo() {
 btnAbrirPerfil.addEventListener("click", abrirPerfil)
 function abrirPerfil() {
     if (usuarioConectado) {
-        document.getElementById("perfilNombre").textContent = usuarioConectado.nombre
-        document.getElementById("perfilUsuario").textContent = usuarioConectado.usuario
-        document.getElementById("perfilEmail").textContent = usuarioConectado.email
-        document.getElementById("perfilContraseña").textContent = usuarioConectado.contraseña
-
+        mostrarDatosPerfil()
+        perfilVista.classList.remove("hidden")
+        perfilEdicion.classList.add("hidden")
         panelPerfil.classList.toggle("hidden")
         panelTransferencias.classList.add("hidden")
         panelPrestamos.classList.add("hidden")
     }
+}
+
+function mostrarDatosPerfil() {
+    document.getElementById("perfilNombre").textContent = usuarioConectado.nombre
+    document.getElementById("perfilEmail").textContent = usuarioConectado.email
+    document.getElementById("perfilUsuario").textContent = usuarioConectado.usuario
+    document.getElementById("perfilContraseña").textContent = usuarioConectado.contraseña
+}
+
+//EDITAR PERFIL
+document.getElementById("btnEditarPerfil").addEventListener("click", abrirEdicionPerfil)
+function abrirEdicionPerfil() {
+    document.getElementById("perfilNombreInput").value = usuarioConectado.nombre
+    document.getElementById("perfilPasswordInput").value = ""
+    perfilVista.classList.add("hidden")
+    perfilEdicion.classList.remove("hidden")
+}
+
+//GUARDAR CAMBIOS DE PERFIL
+document.getElementById("btnGuardarPerfil").addEventListener("click", guardarPerfil)
+function guardarPerfil() {
+    const nuevoNombre = document.getElementById("perfilNombreInput").value.trim()
+    const nuevaContraseña = document.getElementById("perfilPasswordInput").value
+
+    if (!nuevoNombre) {
+        Swal.fire("Error", "El nombre no puede estar vacío", "warning")
+        return
+    }
+
+    usuarioConectado.nombre = nuevoNombre
+    if (nuevaContraseña) {
+        usuarioConectado.contraseña = nuevaContraseña
+    }
+
+    actualizarStorage()
+    bienvenida.textContent = `Bienvenido ${usuarioConectado.nombre}`
+    mostrarDatosPerfil()
+    perfilEdicion.classList.add("hidden")
+    perfilVista.classList.remove("hidden")
+    document.getElementById("perfilPasswordInput").value = ""
+    Swal.fire("Listo", "Tus datos se actualizaron correctamente", "success")
+}
+
+//CANCELAR EDICIÓN
+document.getElementById("btnCancelarPerfil").addEventListener("click", cancelarEdicionPerfil)
+function cancelarEdicionPerfil() {
+    perfilEdicion.classList.add("hidden")
+    perfilVista.classList.remove("hidden")
 }
 
 //FUNCIÓN PARA CREAR NUEVO USUARIO Y GUARDARLO EN LA BASE DE DATO LOCAL
