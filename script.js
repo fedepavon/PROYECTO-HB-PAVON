@@ -17,7 +17,6 @@ async function iniciarBaseDeDatos() {
             const datosOriginales = await res.json()
             usuariosGuardados = datosOriginales
             localStorage.setItem("usuarios",JSON.stringify(usuariosGuardados))
-            console.log(usuariosGuardados)
         }
         catch (error){
             console.error("Error al conectarse a la base de datos", error)
@@ -90,19 +89,6 @@ function abrirEdicionPerfil() {
     document.getElementById("perfilAliasInput").value = usuarioConectado.alias
     perfilVista.classList.add("hidden")
     perfilEdicion.classList.remove("hidden")
-//comprobar que no exista otro usuario con ese email y alias
-    const aliasEnUso = usuariosGuardados.some(u => 
-    u.id !== usuarioConectado.id && u.alias === nuevoAlias)
-    if (aliasEnUso) {
-        Swal.fire("Error", "Ese alias ya está en uso por otro usuario", "warning")
-        return
-    }
-    const emailEnUso = usuariosGuardados.some(u => 
-    u.id !== usuarioConectado.id && u.email === nuevoEmail)
-    if (emailEnUso) {
-        Swal.fire("Error", "Ese email ya está en uso por otro usuario", "warning")
-        return
-    }
 }
 
 //GUARDAR CAMBIOS DE PERFIL
@@ -118,6 +104,14 @@ function guardarPerfil() {
     }
     if (!nuevoAlias) {
         Swal.fire("Error", "Debes tener un alias para continuar", "warning")
+        return
+    }
+
+    const aliasEnUso = usuariosGuardados.some(usuario =>
+        usuario.id !== usuarioConectado.id && usuario.alias === nuevoAlias
+    )
+    if (aliasEnUso) {
+        Swal.fire("Error", "Ese alias ya está en uso por otro usuario", "warning")
         return
     }
 
