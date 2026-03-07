@@ -90,6 +90,19 @@ function abrirEdicionPerfil() {
     document.getElementById("perfilAliasInput").value = usuarioConectado.alias
     perfilVista.classList.add("hidden")
     perfilEdicion.classList.remove("hidden")
+//comprobar que no exista otro usuario con ese email y alias
+    const aliasEnUso = usuariosGuardados.some(u => 
+    u.id !== usuarioConectado.id && u.alias === nuevoAlias)
+    if (aliasEnUso) {
+        Swal.fire("Error", "Ese alias ya está en uso por otro usuario", "warning")
+        return
+    }
+    const emailEnUso = usuariosGuardados.some(u => 
+    u.id !== usuarioConectado.id && u.email === nuevoEmail)
+    if (emailEnUso) {
+        Swal.fire("Error", "Ese email ya está en uso por otro usuario", "warning")
+        return
+    }
 }
 
 //GUARDAR CAMBIOS DE PERFIL
@@ -138,7 +151,18 @@ function crearNuevoUsuario(){
     const email = document.getElementById("registroEmail").value.trim()
     const contraseña = document.getElementById("registroContraseña").value.trim()
     const alias = document.getElementById("registroAlias").value.trim()
-
+//comprobar que no exista otro usuario con ese email y alias
+    const emailRepetido = usuariosGuardados.some(u => u.email === email)
+    if (emailRepetido) {
+        Swal.fire("Error", "Ya existe un usuario con ese email", "warning")
+        return
+    }
+    const aliasRepetido = usuariosGuardados.some(u => u.alias === alias)
+    if (aliasRepetido) {
+        Swal.fire("Error", "Ya existe un usuario con ese alias", "warning")
+        return
+    }
+    
     if(!nombre || !usuario || !email || !contraseña || !alias){
         Swal.fire("Error", "Todos los campos son obligatorios", "warning")
         return
