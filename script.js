@@ -170,37 +170,38 @@ function crearNuevoUsuario(){
 btnAbrirTransferencias.addEventListener("click", () => {panelTransferencias.classList.toggle("hidden")})
 //FUNCIÓN TRANSFERIR DINERO 
 function transferirDinero() {
-    const emailDestino = document.getElementById("emailDestino").value.trim()
+    const aliasDestino = document.getElementById("aliasDestino").value.trim()
     const monto = Number(document.getElementById("montoTransferir").value)
 
-    const usuarioDestino = usuariosGuardados.find(usuario => usuario.email === emailDestino)
-    //swal.fire --> libreria sweetAlert
-    if (!emailDestino) {
-        swal.fire("Opps", "Debés ingresar un email de destino", "warning")
+    const usuarioDestino = usuariosGuardados.find(usuario => usuario.alias === aliasDestino)
+    //USO DE LIBRERIA "SWEETALERT" PARA CONFIRMAR LOS DATOS DE LA TRANSFERENCIA
+    if (!aliasDestino) {
+        Swal.fire("Opps", "Alias incorrecto", "warning")
         return
     }
     if (monto <= 0) {
-        swal.fire("Opps", "El monto ingresado no es válido. Ingresá un valor mayor a $0.", "warning")
+        Swal.fire("Opps", "El monto ingresado no es válido. Ingresá un valor mayor a $0.", "warning")
         return
     }
     if (!usuarioDestino) {
-        swal.fire("Opps", "No existe ningún usuario registrado con ese email.", "warning")
+        Swal.fire("Opps", "No existe ningún usuario registrado con ese alias.", "warning")
         return
     }
-    if (usuarioDestino.email === usuarioConectado.email) {
-        swal.fire("Opps", "No podés transferirte dinero a vos mismo", "warning")
+    if (usuarioDestino.alias === usuarioConectado.alias) {
+        Swal.fire("Opps", "No podés transferirte dinero a vos mismo", "warning")
         return
     }
     if (monto > usuarioConectado.saldo) {
-        swal.fire("Opps", "No se pudo realizar la transferencia porque el saldo es insuficiente.", "warning")
+        Swal.fire("Opps", "No se pudo realizar la transferencia porque el saldo es insuficiente.", "warning")
         return
     }
-    //USO DE LIBRERIA "SWEETALERT" PARA CONFIRMAR LOS DATOS DE LA TRANSFERENCIA
+
     Swal.fire({
         title: "¿DESEA CONFIRMAR TRANSFERENCIA?",
         html:`
         Monto: $${monto}<br>
         Destinatario: ${usuarioDestino.nombre} <br>
+        alias: ${usuarioDestino.alias} <br>
         Email: ${usuarioDestino.email}`,
         icon: "warning",
         showCancelButton: true,
@@ -236,7 +237,7 @@ function calcularCuota(monto, cuotas) {
 
 function solicitarPrestamo() {
     if (!usuarioConectado.prestamo) {
-        swal.fire("Opps", "Tu perfil no tiene préstamos habilitados. <br> Contactá con el banco para más información.", "warning")
+        Swal.fire("Opps", "Tu perfil no tiene préstamos habilitados. <br> Contactá con el banco para más información.", "warning")
         return
     }
 
@@ -244,7 +245,7 @@ function solicitarPrestamo() {
     const cuotas = Number(document.getElementById("cuotas").value)
 
     if (monto <= 0 || !cuotas) {
-        swal.fire("Opps", "Ingresá un monto válido y seleccioná cuotas", "warning")
+        Swal.fire("Opps", "Ingresá un monto válido y seleccioná cuotas", "warning")
         return
     }
 
